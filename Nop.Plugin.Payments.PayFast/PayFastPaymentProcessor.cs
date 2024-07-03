@@ -59,9 +59,9 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="processPaymentRequest">Payment info required for an order processing</param>
         /// <returns>Process payment result</returns>
-        public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
+        public async Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
         {
-            return Task.FromResult(new ProcessPaymentResult());
+            return await Task.FromResult(new ProcessPaymentResult());
         }
 
         /// <summary>
@@ -195,14 +195,14 @@ namespace Nop.Plugin.Payments.PayFast
             return await Task.FromResult(order.OrderStatus == OrderStatus.Pending);
         }
 
-        public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
+        public async Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
         {
-            return Task.FromResult<IList<string>>(new List<string>());
+            return await Task.FromResult<IList<string>>(new List<string>());
         }
 
-        public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
+        public async Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
         {
-            return Task.FromResult(new ProcessPaymentRequest());
+            return await Task.FromResult(new ProcessPaymentRequest());
         }
 
         public override string GetConfigurationPageUrl()
