@@ -12,9 +12,6 @@ namespace Nop.Plugin.Payments.PayFast
                 new { controller = "PaymentPayFast", action = "PayFastResultHandler" });
         }
 
-        public int Priority
-        {
-            get { return 0; }
-        }
+        public int Priority => 0;
     }
 }

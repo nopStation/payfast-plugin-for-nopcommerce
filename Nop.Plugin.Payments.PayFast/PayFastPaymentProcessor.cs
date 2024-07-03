@@ -190,7 +190,7 @@ namespace Nop.Plugin.Payments.PayFast
         public Task<bool> CanRePostProcessPaymentAsync(Order order)
         {
             if (order == null)
-                throw new ArgumentNullException("order");
+                throw new ArgumentNullException(nameof(order));
 
             return Task.FromResult(order.OrderStatus == OrderStatus.Pending);
         }

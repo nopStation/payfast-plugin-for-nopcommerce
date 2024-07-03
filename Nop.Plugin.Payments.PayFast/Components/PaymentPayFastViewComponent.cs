@@ -6,7 +6,7 @@ namespace Nop.Plugin.Payments.PayFast.Components
     [ViewComponent(Name = "PaymentPayFast")]
     public class PaymentPayFastViewComponent : NopViewComponent
     {
-        public IViewComponentResult Invoke()
+        public IViewComponentResult InvokeAsync()
         {
             return View("~/Plugins/Payments.PayFast/Views/PaymentInfo.cshtml");
         }
