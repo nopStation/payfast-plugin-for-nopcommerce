@@ -11,6 +11,8 @@ using Nop.Services.Payments;
 using Nop.Web.Framework;
 using System.Threading.Tasks;
 using Nop.Services.Common;
+using Nop.Plugin.Payments.PayFast.Components;
+using Nop.Services.Orders;
 
 namespace Nop.Plugin.Payments.PayFast
 {
@@ -22,29 +24,30 @@ namespace Nop.Plugin.Payments.PayFast
         #region Fields
 
         private readonly ILocalizationService _localizationService;
-        private readonly IPaymentService _paymentService;
         private readonly ISettingService _settingService;
         private readonly IWebHelper _webHelper;
         private readonly PayFastPaymentSettings _payFastPaymentSettings;
         private readonly IAddressService _addressService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
 
         #endregion
 
         #region Ctor
 
         public PayFastPaymentProcessor(ILocalizationService localizationService,
-            IPaymentService paymentService,
             ISettingService settingService,
             IWebHelper webHelper,
             PayFastPaymentSettings payFastPaymentSettings,
-            IAddressService addressService)
+            IAddressService addressService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _localizationService = localizationService;
-            _paymentService = paymentService;
             _settingService = settingService;
             _webHelper = webHelper;
             _payFastPaymentSettings = payFastPaymentSettings;
             _addressService = addressService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -69,7 +72,7 @@ namespace Nop.Plugin.Payments.PayFast
         {
             var storeLocation = _webHelper.GetStoreLocation();
 
-            var post = new RemotePost
+            var post = new RemotePost(_httpContextAccessor, _webHelper)
             {
                 FormName = "PayFast",
                 Method = "POST",
@@ -114,7 +117,7 @@ namespace Nop.Plugin.Payments.PayFast
         /// <returns>Additional handling fee</returns>
         public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
         {
-            return await _paymentService.CalculateAdditionalFeeAsync(cart,
+            return await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
                 _payFastPaymentSettings.AdditionalFee, _payFastPaymentSettings.AdditionalFeePercentage);
         }
 
@@ -207,9 +210,9 @@ namespace Nop.Plugin.Payments.PayFast
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentPayFast/Configure";
         }
 
-        public string GetPublicViewComponentName()
+        public Type GetPublicViewComponent()
         {
-            return "PaymentPayFast";
+            return typeof(PaymentPayFastViewComponent);
         }
 
         /// <summary>
@@ -265,66 +268,6 @@ namespace Nop.Plugin.Payments.PayFast
             await base.UninstallAsync();
         }
 
-        #endregion
-
-        #region Properies
-
-        /// <summary>
-        /// Gets a value indicating whether capture is supported
-        /// </summary>
-        public bool SupportCapture
-        {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether partial refund is supported
-        /// </summary>
-        public bool SupportPartiallyRefund
-        {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether refund is supported
-        /// </summary>
-        public bool SupportRefund
-        {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether void is supported
-        /// </summary>
-        public bool SupportVoid
-        {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Gets a recurring payment type of payment method
-        /// </summary>
-        public RecurringPaymentType RecurringPaymentType
-        {
-            get { return RecurringPaymentType.NotSupported; }
-        }
-
-        /// <summary>
-        /// Gets a payment method type
-        /// </summary>
-        public PaymentMethodType PaymentMethodType
-        {
-            get { return PaymentMethodType.Redirection; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether we should display a payment information page for this plugin
-        /// </summary>
-        public bool SkipPaymentInfo
-        {
-            get { return false; }
-        }
-
         /// <summary>
         /// Gets a payment method description that will be displayed on checkout pages in the public store
         /// </summary>
@@ -332,6 +275,45 @@ namespace Nop.Plugin.Payments.PayFast
         {
             return await _localizationService.GetResourceAsync("Plugins.Payments.PayFast.PaymentMethodDescription");
         }
+
+        #endregion
+
+        #region Properies
+
+        /// <summary>
+        /// Gets a value indicating whether capture is supported
+        /// </summary>
+        public bool SupportCapture => false;
+
+        /// <summary>
+        /// Gets a value indicating whether partial refund is supported
+        /// </summary>
+        public bool SupportPartiallyRefund => false;
+
+        /// <summary>
+        /// Gets a value indicating whether refund is supported
+        /// </summary>
+        public bool SupportRefund => false;
+
+        /// <summary>
+        /// Gets a value indicating whether void is supported
+        /// </summary>
+        public bool SupportVoid => false;
+
+        /// <summary>
+        /// Gets a recurring payment type of payment method
+        /// </summary>
+        public RecurringPaymentType RecurringPaymentType => RecurringPaymentType.NotSupported;
+
+        /// <summary>
+        /// Gets a payment method type
+        /// </summary>
+        public PaymentMethodType PaymentMethodType => PaymentMethodType.Redirection;
+
+        /// <summary>
+        /// Gets a value indicating whether we should display a payment information page for this plugin
+        /// </summary>
+        public bool SkipPaymentInfo => false;
 
         #endregion
     }

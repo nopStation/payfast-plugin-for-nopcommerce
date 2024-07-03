@@ -1,9 +1,7 @@
-﻿@{
+﻿@model Nop.Plugin.Payments.PayFast.Models.ConfigurationModel
+@{
     Layout = "_ConfigurePlugin";
 }
-
-@model ConfigurationModel
-@using Nop.Plugin.Payments.PayFast.Models;
 
 <form asp-controller="PaymentPayFast" asp-action="Configure" method="post">
     <div class="cards-group">
