@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+<<<<<<< Updated upstream
     <TargetFramework>net7.0</TargetFramework>
+=======
+    <TargetFramework>net8.0</TargetFramework>
+>>>>>>> Stashed changes
     <Copyright>Copyright © Nop Solutions, Ltd</Copyright> 
     <Company>Nop Solutions, Ltd</Company> 
     <Authors>Nop Solutions, Ltd</Authors> 
@@ -12,6 +16,10 @@
     <OutputPath>..\..\Presentation\Nop.Web\Plugins\Payments.PayFast</OutputPath>
     <OutDir>$(OutputPath)</OutDir>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+<<<<<<< Updated upstream
+=======
+    <ImplicitUsings>enable</ImplicitUsings>
+>>>>>>> Stashed changes
   </PropertyGroup>
   
   <ItemGroup>

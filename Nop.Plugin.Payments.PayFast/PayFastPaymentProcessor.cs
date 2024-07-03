@@ -103,12 +103,12 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>true - hide; false - display.</returns>
-        public Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
+        public async Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
         {
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
             //or hide this payment method if current customer is from certain country
-            return Task.FromResult(false);
+            return await Task.FromResult(false);
         }
 
         /// <summary>
@@ -126,11 +126,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="capturePaymentRequest">Capture payment request</param>
         /// <returns>Capture payment result</returns>
-        public Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
+        public async Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
         {
             var result = new CapturePaymentResult();
             result.AddError("Capture method not supported");
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>
@@ -138,11 +138,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="refundPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
+        public async Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
         {
             var result = new RefundPaymentResult();
             result.AddError("Refund method not supported");
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>
@@ -150,11 +150,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="voidPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
+        public async Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
         {
             var result = new VoidPaymentResult();
             result.AddError("Void method not supported");
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>
@@ -162,11 +162,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="processPaymentRequest">Payment info required for an order processing</param>
         /// <returns>Process payment result</returns>
-        public Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
+        public async Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
         {
             var result = new ProcessPaymentResult();
             result.AddError("Recurring Payment method not supported");
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>
@@ -174,12 +174,12 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="cancelPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
+        public async Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
         {
             //always success
             var result = new CancelRecurringPaymentResult();
             result.AddError("Recurring Payment method not supported");
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>
@@ -187,19 +187,19 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>Result</returns>
-        public Task<bool> CanRePostProcessPaymentAsync(Order order)
+        public async Task<bool> CanRePostProcessPaymentAsync(Order order)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
 
-            return Task.FromResult(order.OrderStatus == OrderStatus.Pending);
+            return await Task.FromResult(order.OrderStatus == OrderStatus.Pending);
         }
 
         public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
         {
             return Task.FromResult<IList<string>>(new List<string>());
         }
-        
+
         public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
         {
             return Task.FromResult(new ProcessPaymentRequest());
