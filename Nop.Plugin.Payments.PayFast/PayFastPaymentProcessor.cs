@@ -11,8 +11,6 @@ using Nop.Services.Payments;
 using Nop.Web.Framework;
 using System.Threading.Tasks;
 using Nop.Services.Common;
-using Nop.Plugin.Payments.PayFast.Components;
-using Nop.Services.Orders;
 
 namespace Nop.Plugin.Payments.PayFast
 {
@@ -24,30 +22,29 @@ namespace Nop.Plugin.Payments.PayFast
         #region Fields
 
         private readonly ILocalizationService _localizationService;
+        private readonly IPaymentService _paymentService;
         private readonly ISettingService _settingService;
         private readonly IWebHelper _webHelper;
         private readonly PayFastPaymentSettings _payFastPaymentSettings;
         private readonly IAddressService _addressService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
 
         #endregion
 
         #region Ctor
 
         public PayFastPaymentProcessor(ILocalizationService localizationService,
+            IPaymentService paymentService,
             ISettingService settingService,
             IWebHelper webHelper,
             PayFastPaymentSettings payFastPaymentSettings,
-            IAddressService addressService,
-            IHttpContextAccessor httpContextAccessor)
+            IAddressService addressService)
         {
             _localizationService = localizationService;
+            _paymentService = paymentService;
             _settingService = settingService;
             _webHelper = webHelper;
             _payFastPaymentSettings = payFastPaymentSettings;
             _addressService = addressService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -59,9 +56,9 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="processPaymentRequest">Payment info required for an order processing</param>
         /// <returns>Process payment result</returns>
-        public async Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
+        public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
         {
-            return await Task.FromResult(new ProcessPaymentResult());
+            return Task.FromResult(new ProcessPaymentResult());
         }
 
         /// <summary>
@@ -72,7 +69,7 @@ namespace Nop.Plugin.Payments.PayFast
         {
             var storeLocation = _webHelper.GetStoreLocation();
 
-            var post = new RemotePost(_httpContextAccessor, _webHelper)
+            var post = new RemotePost
             {
                 FormName = "PayFast",
                 Method = "POST",
@@ -103,12 +100,12 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>true - hide; false - display.</returns>
-        public async Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
+        public Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
         {
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
             //or hide this payment method if current customer is from certain country
-            return await Task.FromResult(false);
+            return Task.FromResult(false);
         }
 
         /// <summary>
@@ -117,7 +114,7 @@ namespace Nop.Plugin.Payments.PayFast
         /// <returns>Additional handling fee</returns>
         public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
         {
-            return await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
+            return await _paymentService.CalculateAdditionalFeeAsync(cart,
                 _payFastPaymentSettings.AdditionalFee, _payFastPaymentSettings.AdditionalFeePercentage);
         }
 
@@ -126,11 +123,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="capturePaymentRequest">Capture payment request</param>
         /// <returns>Capture payment result</returns>
-        public async Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
+        public Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
         {
             var result = new CapturePaymentResult();
             result.AddError("Capture method not supported");
-            return await Task.FromResult(result);
+            return Task.FromResult(result);
         }
 
         /// <summary>
@@ -138,11 +135,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="refundPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public async Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
+        public Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
         {
             var result = new RefundPaymentResult();
             result.AddError("Refund method not supported");
-            return await Task.FromResult(result);
+            return Task.FromResult(result);
         }
 
         /// <summary>
@@ -150,11 +147,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="voidPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public async Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
+        public Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
         {
             var result = new VoidPaymentResult();
             result.AddError("Void method not supported");
-            return await Task.FromResult(result);
+            return Task.FromResult(result);
         }
 
         /// <summary>
@@ -162,11 +159,11 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="processPaymentRequest">Payment info required for an order processing</param>
         /// <returns>Process payment result</returns>
-        public async Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
+        public Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
         {
             var result = new ProcessPaymentResult();
             result.AddError("Recurring Payment method not supported");
-            return await Task.FromResult(result);
+            return Task.FromResult(result);
         }
 
         /// <summary>
@@ -174,12 +171,12 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="cancelPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public async Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
+        public Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
         {
             //always success
             var result = new CancelRecurringPaymentResult();
             result.AddError("Recurring Payment method not supported");
-            return await Task.FromResult(result);
+            return Task.FromResult(result);
         }
 
         /// <summary>
@@ -187,22 +184,22 @@ namespace Nop.Plugin.Payments.PayFast
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>Result</returns>
-        public async Task<bool> CanRePostProcessPaymentAsync(Order order)
+        public Task<bool> CanRePostProcessPaymentAsync(Order order)
         {
             if (order == null)
-                throw new ArgumentNullException(nameof(order));
+                throw new ArgumentNullException("order");
 
-            return await Task.FromResult(order.OrderStatus == OrderStatus.Pending);
+            return Task.FromResult(order.OrderStatus == OrderStatus.Pending);
         }
 
-        public async Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
+        public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
         {
-            return await Task.FromResult<IList<string>>(new List<string>());
+            return Task.FromResult<IList<string>>(new List<string>());
         }
-
-        public async Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
+        
+        public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
         {
-            return await Task.FromResult(new ProcessPaymentRequest());
+            return Task.FromResult(new ProcessPaymentRequest());
         }
 
         public override string GetConfigurationPageUrl()
@@ -210,9 +207,9 @@ namespace Nop.Plugin.Payments.PayFast
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentPayFast/Configure";
         }
 
-        public Type GetPublicViewComponent()
+        public string GetPublicViewComponentName()
         {
-            return typeof(PaymentPayFastViewComponent);
+            return "PaymentPayFast";
         }
 
         /// <summary>
@@ -268,14 +265,6 @@ namespace Nop.Plugin.Payments.PayFast
             await base.UninstallAsync();
         }
 
-        /// <summary>
-        /// Gets a payment method description that will be displayed on checkout pages in the public store
-        /// </summary>
-        public async Task<string> GetPaymentMethodDescriptionAsync()
-        {
-            return await _localizationService.GetResourceAsync("Plugins.Payments.PayFast.PaymentMethodDescription");
-        }
-
         #endregion
 
         #region Properies
@@ -283,37 +272,66 @@ namespace Nop.Plugin.Payments.PayFast
         /// <summary>
         /// Gets a value indicating whether capture is supported
         /// </summary>
-        public bool SupportCapture => false;
+        public bool SupportCapture
+        {
+            get { return false; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether partial refund is supported
         /// </summary>
-        public bool SupportPartiallyRefund => false;
+        public bool SupportPartiallyRefund
+        {
+            get { return false; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether refund is supported
         /// </summary>
-        public bool SupportRefund => false;
+        public bool SupportRefund
+        {
+            get { return false; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether void is supported
         /// </summary>
-        public bool SupportVoid => false;
+        public bool SupportVoid
+        {
+            get { return false; }
+        }
 
         /// <summary>
         /// Gets a recurring payment type of payment method
         /// </summary>
-        public RecurringPaymentType RecurringPaymentType => RecurringPaymentType.NotSupported;
+        public RecurringPaymentType RecurringPaymentType
+        {
+            get { return RecurringPaymentType.NotSupported; }
+        }
 
         /// <summary>
         /// Gets a payment method type
         /// </summary>
-        public PaymentMethodType PaymentMethodType => PaymentMethodType.Redirection;
+        public PaymentMethodType PaymentMethodType
+        {
+            get { return PaymentMethodType.Redirection; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether we should display a payment information page for this plugin
         /// </summary>
-        public bool SkipPaymentInfo => false;
+        public bool SkipPaymentInfo
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// Gets a payment method description that will be displayed on checkout pages in the public store
+        /// </summary>
+        public async Task<string> GetPaymentMethodDescriptionAsync()
+        {
+            return await _localizationService.GetResourceAsync("Plugins.Payments.PayFast.PaymentMethodDescription");
+        }
 
         #endregion
     }
