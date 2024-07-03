@@ -75,7 +75,7 @@ namespace Nop.Plugin.Payments.PayFast.Controllers
             Order order = null;
 
             //validate order
-            if (!Guid.TryParse(form["m_payment_id"], out Guid orderGuid))
+            if (!Guid.TryParse(form["m_payment_id"], out var orderGuid))
                 return (false, order);
 
             order = await _orderService.GetOrderByGuidAsync(orderGuid);
@@ -163,8 +163,8 @@ namespace Nop.Plugin.Payments.PayFast.Controllers
         #region Methods
 
         [AuthorizeAdmin]
-        [Area(AreaNames.Admin)]
-        public async Task<IActionResult> Configure()
+        [Area(AreaNames.ADMIN)]
+        public async Task<IActionResult> ConfigureAsync()
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManagePaymentMethods))
                 return AccessDeniedView();
@@ -183,8 +183,8 @@ namespace Nop.Plugin.Payments.PayFast.Controllers
 
         [HttpPost]
         [AuthorizeAdmin]
-        [Area(AreaNames.Admin)]
-        public async Task<IActionResult> Configure(ConfigurationModel model)
+        [Area(AreaNames.ADMIN)]
+        public async Task<IActionResult> ConfigureAsync(ConfigurationModel model)
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManagePaymentMethods))
                 return AccessDeniedView();
@@ -202,10 +202,10 @@ namespace Nop.Plugin.Payments.PayFast.Controllers
             return RedirectToAction("Configure");
         }
 
-        public async Task<IActionResult> PayFastResultHandler(IFormCollection form)
+        public async Task<IActionResult> PayFastResultHandlerAsync(IFormCollection form)
         {
             //validation
-            (bool valid, Order order) = await ValidateITNAsync(form);
+            (var valid, var order) = await ValidateITNAsync(form);
             if (!valid)
                 return new StatusCodeResult((int)HttpStatusCode.OK);
 
